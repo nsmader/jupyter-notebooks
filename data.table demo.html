@@ -176,7 +176,7 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Demonstration-of-data.table-functionality">Demonstration of data.table functionality<a class="anchor-link" href="#Demonstration-of-data.table-functionality">&#182;</a></h1><p>For several great example-based resources for seeing what data.table can do, see:</p>
+<p style="font-size:36px"> Demonstration of data.table functionality</p><p>For several great example-based resources for seeing what data.table can do, see:</p>
 <ul>
 <li>DataCamp's data.table cheat sheet (saved under <strong>H:\LIBRARY\R references/data.table/data.table cheat sheet.pdf</strong>)</li>
 <li>the built-in function <code>example(data.table)</code> after loading the <code>data.table</code> library into R, and</li>
@@ -191,7 +191,7 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Generate-data">Generate data<a class="anchor-link" href="#Generate-data">&#182;</a></h2><p>We'll start our demo with a simple data set that reflects as much richness as we'll need. Later, we'll generate much larger data sets to demonstrate the considerable speed advantages of data.table over data.frame methods.</p>
+<h1 id="Basics-of-data.table">Basics of data.table<a class="anchor-link" href="#Basics-of-data.table">&#182;</a></h1><p>We'll start our demo with a simple data set that reflects as much richness as we'll need. Later, we'll generate much larger data sets to demonstrate the considerable speed advantages of data.table over data.frame methods.</p>
 <p>Note that the data.frame "DF" and data.table "DT" have exactly parallel structure as displayed here. In R, their printed representations will differ slightly, where DT has a smarter printout, showing both head and tail rows, and field names printed at the bottom of the table for easier reference.</p>
 
 </div>
@@ -283,9 +283,9 @@ DT
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="General-structure-of-working-with-data.table-objects">General structure of working with data.table objects<a class="anchor-link" href="#General-structure-of-working-with-data.table-objects">&#182;</a></h2><p>Whereas data.frame contents can be accessed using square brackets and references to rows and columns, i.e. <code>df[*row indication*, *col indication*]</code>, data.table contents take three arguments: <code>dt[i,j,by]</code> where:</p>
 <ul>
-<li>i - indication of rows</li>
-<li>j - indication/operation on columns (optional)</li>
-<li>by - built-in ability to run operations with a subset</li>
+<li><code>i</code> - indication of rows</li>
+<li><code>j</code> - indication/operation on columns (optional)</li>
+<li><code>by</code> - built-in ability to run operations with a subset</li>
 </ul>
 
 </div>
@@ -863,7 +863,7 @@ DT<span class="p">[,</span> <span class="p">{</span><span class="kp">print</span
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Working-with-&quot;by&quot;s">Working with "by"s<a class="anchor-link" href="#Working-with-&quot;by&quot;s">&#182;</a></h2>
+<h1 id="Working-with-&quot;by&quot;s">Working with "by"s<a class="anchor-link" href="#Working-with-&quot;by&quot;s">&#182;</a></h1>
 </div>
 </div>
 </div>
@@ -1098,7 +1098,7 @@ DT<span class="p">[</span>sch <span class="o">==</span> <span class="s">&quot;No
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Working-with-special-values">Working with special values<a class="anchor-link" href="#Working-with-special-values">&#182;</a></h2><p>E.g. ".N", ".I", ".GRP", ".SD" and others</p>
+<h1 id="Working-with-special-values">Working with special values<a class="anchor-link" href="#Working-with-special-values">&#182;</a></h1><p>E.g. ".N", ".I", ".GRP", ".SD" and others</p>
 
 </div>
 </div>
@@ -1144,14 +1144,14 @@ DT<span class="p">[,</span> <span class="m">.</span><span class="p">(</span>coun
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Using-.SD-to-perform-operations-across-many-columns">Using .SD to perform operations across many columns<a class="anchor-link" href="#Using-.SD-to-perform-operations-across-many-columns">&#182;</a></h3><p><code>.SD</code> is shorthand for all of the columns besides those used in the "by". Subsets of those columns can be determined by adding a argument of <code>.SDcols</code> within the data.table statement.</p>
+<h2 id="Using-.SD-to-perform-operations-across-many-columns">Using .SD to perform operations across many columns<a class="anchor-link" href="#Using-.SD-to-perform-operations-across-many-columns">&#182;</a></h2><p><code>.SD</code> is shorthand for all of the columns besides those used in the "by". Subsets of those columns can be determined by adding a argument of <code>.SDcols</code> within the data.table statement.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[60]:</div>
+<div class="prompt input_prompt">In&nbsp;[22]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span>n <span class="o">&lt;-</span> <span class="m">100</span>
@@ -1169,15 +1169,15 @@ dtScores<span class="p">[,</span><span class="kp">lapply</span><span class="p">(
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[60]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[22]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
 <table>
 <thead><tr><th></th><th scope=col>cat</th><th scope=col>score1</th><th scope=col>score2</th><th scope=col>score3</th></tr></thead>
 <tbody>
-	<tr><th scope=row>1</th><td>B</td><td>0.5126894</td><td>0.1513136</td><td>-0.1114473</td></tr>
-	<tr><th scope=row>2</th><td>C</td><td>0.5159997</td><td>-0.1173173</td><td>0.3550487</td></tr>
-	<tr><th scope=row>3</th><td>A</td><td>0.4935632</td><td>-0.03775447</td><td>0.4366111</td></tr>
+	<tr><th scope=row>1</th><td>A</td><td>0.4649029</td><td>-0.02409428</td><td>0.4661274</td></tr>
+	<tr><th scope=row>2</th><td>C</td><td>0.4925664</td><td>0.04642162</td><td>0.453456</td></tr>
+	<tr><th scope=row>3</th><td>B</td><td>0.5717518</td><td>0.07706304</td><td>-0.005196022</td></tr>
 </tbody>
 </table>
 
@@ -1185,15 +1185,15 @@ dtScores<span class="p">[,</span><span class="kp">lapply</span><span class="p">(
 
 </div>
 
-<div class="output_area"><div class="prompt output_prompt">Out[60]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[22]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
 <table>
 <thead><tr><th></th><th scope=col>cat</th><th scope=col>score2</th><th scope=col>score3</th></tr></thead>
 <tbody>
-	<tr><th scope=row>1</th><td>B</td><td>0.1513136</td><td>-0.1114473</td></tr>
-	<tr><th scope=row>2</th><td>C</td><td>-0.1173173</td><td>0.3550487</td></tr>
-	<tr><th scope=row>3</th><td>A</td><td>-0.03775447</td><td>0.4366111</td></tr>
+	<tr><th scope=row>1</th><td>A</td><td>-0.02409428</td><td>0.4661274</td></tr>
+	<tr><th scope=row>2</th><td>C</td><td>0.04642162</td><td>0.453456</td></tr>
+	<tr><th scope=row>3</th><td>B</td><td>0.07706304</td><td>-0.005196022</td></tr>
 </tbody>
 </table>
 
@@ -1210,13 +1210,13 @@ dtScores<span class="p">[,</span><span class="kp">lapply</span><span class="p">(
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Using-the-:=-operator">Using the <code>:=</code> operator<a class="anchor-link" href="#Using-the-:=-operator">&#182;</a></h2>
+<h1 id="Using-the-:=-operator-for-assignments">Using the <code>:=</code> operator for assignments<a class="anchor-link" href="#Using-the-:=-operator-for-assignments">&#182;</a></h1>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[22]:</div>
+<div class="prompt input_prompt">In&nbsp;[23]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Using &quot;:=&quot; generates an assignment within the data table. Rather than being an on-the-fly calculation, it directly </span>
@@ -1234,7 +1234,7 @@ DT<span class="p">[,</span> mean_score <span class="o">:=</span> <span class="kp
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[22]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[23]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
 <table>
@@ -1265,7 +1265,7 @@ DT<span class="p">[,</span> mean_score <span class="o">:=</span> <span class="kp
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[23]:</div>
+<div class="prompt input_prompt">In&nbsp;[24]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># The &quot;:=&quot; operator can be used to create multiple new columns.</span>
@@ -1282,24 +1282,24 @@ DT<span class="p">[,</span> <span class="kt">c</span><span class="p">(</span><sp
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[23]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[24]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
 <table>
 <thead><tr><th></th><th scope=col>id</th><th scope=col>prog</th><th scope=col>sch</th><th scope=col>gender</th><th scope=col>score</th><th scope=col>mean_score</th><th scope=col>A</th><th scope=col>B</th></tr></thead>
 <tbody>
-	<tr><th scope=row>1</th><td>1</td><td>A</td><td>North</td><td>F</td><td>0.06739996</td><td>0.4596354</td><td>0.2839473</td><td>a</td></tr>
-	<tr><th scope=row>2</th><td>2</td><td>A</td><td>South</td><td>F</td><td>0.9206563</td><td>0.4596354</td><td>0.8333726</td><td>b</td></tr>
-	<tr><th scope=row>3</th><td>3</td><td>A</td><td>North</td><td>F</td><td>0.6910774</td><td>0.4596354</td><td>0.4631471</td><td>c</td></tr>
-	<tr><th scope=row>4</th><td>4</td><td>A</td><td>South</td><td>F</td><td>0.04123674</td><td>0.4596354</td><td>0.07403799</td><td>d</td></tr>
-	<tr><th scope=row>5</th><td>5</td><td>B</td><td>North</td><td>M</td><td>0.8092121</td><td>0.4596354</td><td>0.8115554</td><td>e</td></tr>
-	<tr><th scope=row>6</th><td>6</td><td>B</td><td>South</td><td>M</td><td>0.106991</td><td>0.4596354</td><td>0.08632446</td><td>f</td></tr>
-	<tr><th scope=row>7</th><td>7</td><td>B</td><td>North</td><td>M</td><td>0.4896426</td><td>0.4596354</td><td>0.5775486</td><td>g</td></tr>
-	<tr><th scope=row>8</th><td>8</td><td>B</td><td>South</td><td>M</td><td>0.05879476</td><td>0.4596354</td><td>0.7446151</td><td>h</td></tr>
-	<tr><th scope=row>9</th><td>9</td><td>None</td><td>North</td><td>F</td><td>0.2349503</td><td>0.4596354</td><td>0.9303926</td><td>i</td></tr>
-	<tr><th scope=row>10</th><td>10</td><td>None</td><td>South</td><td>M</td><td>0.362945</td><td>0.4596354</td><td>0.4192247</td><td>j</td></tr>
-	<tr><th scope=row>11</th><td>11</td><td>None</td><td>North</td><td>F</td><td>0.8463468</td><td>0.4596354</td><td>0.5420228</td><td>k</td></tr>
-	<tr><th scope=row>12</th><td>12</td><td>None</td><td>South</td><td>M</td><td>0.8863718</td><td>0.4596354</td><td>0.4884854</td><td>l</td></tr>
+	<tr><th scope=row>1</th><td>1</td><td>A</td><td>North</td><td>F</td><td>0.06739996</td><td>0.4596354</td><td>0.7790998</td><td>a</td></tr>
+	<tr><th scope=row>2</th><td>2</td><td>A</td><td>South</td><td>F</td><td>0.9206563</td><td>0.4596354</td><td>0.5007577</td><td>b</td></tr>
+	<tr><th scope=row>3</th><td>3</td><td>A</td><td>North</td><td>F</td><td>0.6910774</td><td>0.4596354</td><td>0.5725961</td><td>c</td></tr>
+	<tr><th scope=row>4</th><td>4</td><td>A</td><td>South</td><td>F</td><td>0.04123674</td><td>0.4596354</td><td>0.1458192</td><td>d</td></tr>
+	<tr><th scope=row>5</th><td>5</td><td>B</td><td>North</td><td>M</td><td>0.8092121</td><td>0.4596354</td><td>0.8328311</td><td>e</td></tr>
+	<tr><th scope=row>6</th><td>6</td><td>B</td><td>South</td><td>M</td><td>0.106991</td><td>0.4596354</td><td>0.1355983</td><td>f</td></tr>
+	<tr><th scope=row>7</th><td>7</td><td>B</td><td>North</td><td>M</td><td>0.4896426</td><td>0.4596354</td><td>0.4246577</td><td>g</td></tr>
+	<tr><th scope=row>8</th><td>8</td><td>B</td><td>South</td><td>M</td><td>0.05879476</td><td>0.4596354</td><td>0.4855925</td><td>h</td></tr>
+	<tr><th scope=row>9</th><td>9</td><td>None</td><td>North</td><td>F</td><td>0.2349503</td><td>0.4596354</td><td>0.5816945</td><td>i</td></tr>
+	<tr><th scope=row>10</th><td>10</td><td>None</td><td>South</td><td>M</td><td>0.362945</td><td>0.4596354</td><td>0.4928414</td><td>j</td></tr>
+	<tr><th scope=row>11</th><td>11</td><td>None</td><td>North</td><td>F</td><td>0.8463468</td><td>0.4596354</td><td>0.9395568</td><td>k</td></tr>
+	<tr><th scope=row>12</th><td>12</td><td>None</td><td>South</td><td>M</td><td>0.8863718</td><td>0.4596354</td><td>0.1247695</td><td>l</td></tr>
 </tbody>
 </table>
 
@@ -1313,7 +1313,7 @@ DT<span class="p">[,</span> <span class="kt">c</span><span class="p">(</span><sp
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[29]:</div>
+<div class="prompt input_prompt">In&nbsp;[25]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Columns can be removed by using &quot;:=&quot; to assign columns to null</span>
@@ -1329,24 +1329,24 @@ DT<span class="p">[,</span> <span class="kt">c</span><span class="p">(</span><sp
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[29]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[25]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
 <table>
-<thead><tr><th></th><th scope=col>id</th><th scope=col>prog</th><th scope=col>sch</th><th scope=col>gender</th><th scope=col>score</th><th scope=col>plusfive</th><th scope=col>fSomeProg</th><th scope=col>someProg</th><th scope=col>male</th></tr></thead>
+<thead><tr><th></th><th scope=col>id</th><th scope=col>prog</th><th scope=col>sch</th><th scope=col>gender</th><th scope=col>score</th><th scope=col>A</th><th scope=col>B</th></tr></thead>
 <tbody>
-	<tr><th scope=row>1</th><td>1</td><td>A</td><td>North</td><td>F</td><td>0.06739996</td><td>5.0674</td><td>Yep</td><td>Yep</td><td>TRUE</td></tr>
-	<tr><th scope=row>2</th><td>2</td><td>A</td><td>South</td><td>F</td><td>0.9206563</td><td>5.920656</td><td>Yep</td><td>Yep</td><td>TRUE</td></tr>
-	<tr><th scope=row>3</th><td>3</td><td>A</td><td>North</td><td>F</td><td>0.6910774</td><td>5.691077</td><td>Yep</td><td>Yep</td><td>TRUE</td></tr>
-	<tr><th scope=row>4</th><td>4</td><td>A</td><td>South</td><td>F</td><td>0.04123674</td><td>5.041237</td><td>Yep</td><td>Yep</td><td>TRUE</td></tr>
-	<tr><th scope=row>5</th><td>5</td><td>B</td><td>North</td><td>M</td><td>0.8092121</td><td>5.809212</td><td>Yep</td><td>Yep</td><td>NA</td></tr>
-	<tr><th scope=row>6</th><td>6</td><td>B</td><td>South</td><td>M</td><td>0.106991</td><td>5.106991</td><td>Yep</td><td>Yep</td><td>NA</td></tr>
-	<tr><th scope=row>7</th><td>7</td><td>B</td><td>North</td><td>M</td><td>0.4896426</td><td>5.489643</td><td>Yep</td><td>Yep</td><td>NA</td></tr>
-	<tr><th scope=row>8</th><td>8</td><td>B</td><td>South</td><td>M</td><td>0.05879476</td><td>5.058795</td><td>Yep</td><td>Yep</td><td>NA</td></tr>
-	<tr><th scope=row>9</th><td>9</td><td>None</td><td>North</td><td>F</td><td>0.2349503</td><td>5.23495</td><td>Nope</td><td>Nope</td><td>TRUE</td></tr>
-	<tr><th scope=row>10</th><td>10</td><td>None</td><td>South</td><td>M</td><td>0.362945</td><td>5.362945</td><td>Nope</td><td>Nope</td><td>NA</td></tr>
-	<tr><th scope=row>11</th><td>11</td><td>None</td><td>North</td><td>F</td><td>0.8463468</td><td>5.846347</td><td>Nope</td><td>Nope</td><td>TRUE</td></tr>
-	<tr><th scope=row>12</th><td>12</td><td>None</td><td>South</td><td>M</td><td>0.8863718</td><td>5.886372</td><td>Nope</td><td>Nope</td><td>NA</td></tr>
+	<tr><th scope=row>1</th><td>1</td><td>A</td><td>North</td><td>F</td><td>0.06739996</td><td>0.7790998</td><td>a</td></tr>
+	<tr><th scope=row>2</th><td>2</td><td>A</td><td>South</td><td>F</td><td>0.9206563</td><td>0.5007577</td><td>b</td></tr>
+	<tr><th scope=row>3</th><td>3</td><td>A</td><td>North</td><td>F</td><td>0.6910774</td><td>0.5725961</td><td>c</td></tr>
+	<tr><th scope=row>4</th><td>4</td><td>A</td><td>South</td><td>F</td><td>0.04123674</td><td>0.1458192</td><td>d</td></tr>
+	<tr><th scope=row>5</th><td>5</td><td>B</td><td>North</td><td>M</td><td>0.8092121</td><td>0.8328311</td><td>e</td></tr>
+	<tr><th scope=row>6</th><td>6</td><td>B</td><td>South</td><td>M</td><td>0.106991</td><td>0.1355983</td><td>f</td></tr>
+	<tr><th scope=row>7</th><td>7</td><td>B</td><td>North</td><td>M</td><td>0.4896426</td><td>0.4246577</td><td>g</td></tr>
+	<tr><th scope=row>8</th><td>8</td><td>B</td><td>South</td><td>M</td><td>0.05879476</td><td>0.4855925</td><td>h</td></tr>
+	<tr><th scope=row>9</th><td>9</td><td>None</td><td>North</td><td>F</td><td>0.2349503</td><td>0.5816945</td><td>i</td></tr>
+	<tr><th scope=row>10</th><td>10</td><td>None</td><td>South</td><td>M</td><td>0.362945</td><td>0.4928414</td><td>j</td></tr>
+	<tr><th scope=row>11</th><td>11</td><td>None</td><td>North</td><td>F</td><td>0.8463468</td><td>0.9395568</td><td>k</td></tr>
+	<tr><th scope=row>12</th><td>12</td><td>None</td><td>South</td><td>M</td><td>0.8863718</td><td>0.1247695</td><td>l</td></tr>
 </tbody>
 </table>
 
@@ -1354,32 +1354,24 @@ DT<span class="p">[,</span> <span class="kt">c</span><span class="p">(</span><sp
 
 </div>
 
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>Warning message:
-In &#96;[.data.table&#96;(DT, , &#96;:=&#96;(c(&quot;A&quot;, &quot;B&quot;), NULL)): Adding new column &apos;A&apos; then assigning NULL (deleting it).Warning message:
-In &#96;[.data.table&#96;(DT, , &#96;:=&#96;(c(&quot;A&quot;, &quot;B&quot;), NULL)): Adding new column &apos;B&apos; then assigning NULL (deleting it).</pre>
-</div>
-</div>
-
-<div class="output_area"><div class="prompt output_prompt">Out[29]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[25]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
 <table>
-<thead><tr><th></th><th scope=col>id</th><th scope=col>prog</th><th scope=col>sch</th><th scope=col>gender</th><th scope=col>score</th><th scope=col>plusfive</th><th scope=col>fSomeProg</th><th scope=col>someProg</th><th scope=col>male</th></tr></thead>
+<thead><tr><th></th><th scope=col>id</th><th scope=col>prog</th><th scope=col>sch</th><th scope=col>gender</th><th scope=col>score</th></tr></thead>
 <tbody>
-	<tr><th scope=row>1</th><td>1</td><td>A</td><td>North</td><td>F</td><td>0.06739996</td><td>5.0674</td><td>Yep</td><td>Yep</td><td>TRUE</td></tr>
-	<tr><th scope=row>2</th><td>2</td><td>A</td><td>South</td><td>F</td><td>0.9206563</td><td>5.920656</td><td>Yep</td><td>Yep</td><td>TRUE</td></tr>
-	<tr><th scope=row>3</th><td>3</td><td>A</td><td>North</td><td>F</td><td>0.6910774</td><td>5.691077</td><td>Yep</td><td>Yep</td><td>TRUE</td></tr>
-	<tr><th scope=row>4</th><td>4</td><td>A</td><td>South</td><td>F</td><td>0.04123674</td><td>5.041237</td><td>Yep</td><td>Yep</td><td>TRUE</td></tr>
-	<tr><th scope=row>5</th><td>5</td><td>B</td><td>North</td><td>M</td><td>0.8092121</td><td>5.809212</td><td>Yep</td><td>Yep</td><td>NA</td></tr>
-	<tr><th scope=row>6</th><td>6</td><td>B</td><td>South</td><td>M</td><td>0.106991</td><td>5.106991</td><td>Yep</td><td>Yep</td><td>NA</td></tr>
-	<tr><th scope=row>7</th><td>7</td><td>B</td><td>North</td><td>M</td><td>0.4896426</td><td>5.489643</td><td>Yep</td><td>Yep</td><td>NA</td></tr>
-	<tr><th scope=row>8</th><td>8</td><td>B</td><td>South</td><td>M</td><td>0.05879476</td><td>5.058795</td><td>Yep</td><td>Yep</td><td>NA</td></tr>
-	<tr><th scope=row>9</th><td>9</td><td>None</td><td>North</td><td>F</td><td>0.2349503</td><td>5.23495</td><td>Nope</td><td>Nope</td><td>TRUE</td></tr>
-	<tr><th scope=row>10</th><td>10</td><td>None</td><td>South</td><td>M</td><td>0.362945</td><td>5.362945</td><td>Nope</td><td>Nope</td><td>NA</td></tr>
-	<tr><th scope=row>11</th><td>11</td><td>None</td><td>North</td><td>F</td><td>0.8463468</td><td>5.846347</td><td>Nope</td><td>Nope</td><td>TRUE</td></tr>
-	<tr><th scope=row>12</th><td>12</td><td>None</td><td>South</td><td>M</td><td>0.8863718</td><td>5.886372</td><td>Nope</td><td>Nope</td><td>NA</td></tr>
+	<tr><th scope=row>1</th><td>1</td><td>A</td><td>North</td><td>F</td><td>0.06739996</td></tr>
+	<tr><th scope=row>2</th><td>2</td><td>A</td><td>South</td><td>F</td><td>0.9206563</td></tr>
+	<tr><th scope=row>3</th><td>3</td><td>A</td><td>North</td><td>F</td><td>0.6910774</td></tr>
+	<tr><th scope=row>4</th><td>4</td><td>A</td><td>South</td><td>F</td><td>0.04123674</td></tr>
+	<tr><th scope=row>5</th><td>5</td><td>B</td><td>North</td><td>M</td><td>0.8092121</td></tr>
+	<tr><th scope=row>6</th><td>6</td><td>B</td><td>South</td><td>M</td><td>0.106991</td></tr>
+	<tr><th scope=row>7</th><td>7</td><td>B</td><td>North</td><td>M</td><td>0.4896426</td></tr>
+	<tr><th scope=row>8</th><td>8</td><td>B</td><td>South</td><td>M</td><td>0.05879476</td></tr>
+	<tr><th scope=row>9</th><td>9</td><td>None</td><td>North</td><td>F</td><td>0.2349503</td></tr>
+	<tr><th scope=row>10</th><td>10</td><td>None</td><td>South</td><td>M</td><td>0.362945</td></tr>
+	<tr><th scope=row>11</th><td>11</td><td>None</td><td>North</td><td>F</td><td>0.8463468</td></tr>
+	<tr><th scope=row>12</th><td>12</td><td>None</td><td>South</td><td>M</td><td>0.8863718</td></tr>
 </tbody>
 </table>
 
@@ -1396,14 +1388,14 @@ In &#96;[.data.table&#96;(DT, , &#96;:=&#96;(c(&quot;A&quot;, &quot;B&quot;), NU
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Chaining">Chaining<a class="anchor-link" href="#Chaining">&#182;</a></h2><p>Chaining is a straightforward way to perform multiple sequential operations on a given object. It is not unique to data.table objects, but can be very handy.</p>
+<h1 id="Chaining">Chaining<a class="anchor-link" href="#Chaining">&#182;</a></h1><p>Chaining is a straightforward way to perform multiple sequential operations on a given object. It is not unique to data.table objects, but can be very handy.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[26]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># A fully spelled-out sequential process</span>
@@ -1415,6 +1407,37 @@ DT<span class="p">[,</span> score_mean <span class="o">=</span> <span class="kp"
 </pre></div>
 
 </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_text output_error">
+<pre>
+Error in &#96;[.data.table&#96;(DT, , score_mean = mean(score), by = prog): unused argument (score_mean = mean(score))
+</pre>
+</div>
+</div>
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_text output_error">
+<pre>
+Error in eval(expr, envir, enclos): object &apos;temp&apos; not found
+</pre>
+</div>
+</div>
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_text output_error">
+<pre>
+Error in &#96;[.data.table&#96;(DT, , score_mean = mean(score), by = prog): unused argument (score_mean = mean(score))
+</pre>
+</div>
+</div>
+
 </div>
 </div>
 
@@ -1447,13 +1470,13 @@ DT<span class="p">[,</span> score_mean <span class="o">=</span> <span class="kp"
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Using-data.table-for-data-manipulations">Using data.table for data manipulations<a class="anchor-link" href="#Using-data.table-for-data-manipulations">&#182;</a></h2>
+<h1 id="Using-data.table-for-data-manipulations">Using data.table for data manipulations<a class="anchor-link" href="#Using-data.table-for-data-manipulations">&#182;</a></h1>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[25]:</div>
+<div class="prompt input_prompt">In&nbsp;[27]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Operations that you commonly perform on data.frames will work with data.table objects too</span>
@@ -1474,19 +1497,19 @@ str<span class="p">(</span>DT<span class="p">)</span>
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[25]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[27]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
 <table>
-<thead><tr><th></th><th scope=col>id</th><th scope=col>prog</th><th scope=col>sch</th><th scope=col>gender</th><th scope=col>score</th><th scope=col>mean_score</th><th scope=col>plusfive</th><th scope=col>fSomeProg</th><th scope=col>someProg</th></tr></thead>
+<thead><tr><th></th><th scope=col>id</th><th scope=col>prog</th><th scope=col>sch</th><th scope=col>gender</th><th scope=col>score</th><th scope=col>plusfive</th><th scope=col>fSomeProg</th><th scope=col>someProg</th></tr></thead>
 <tbody>
-	<tr><th scope=row>1</th><td>6</td><td>B</td><td>South</td><td>M</td><td>0.106991</td><td>0.4596354</td><td>5.106991</td><td>Yep</td><td>Yep</td></tr>
-	<tr><th scope=row>2</th><td>7</td><td>B</td><td>North</td><td>M</td><td>0.4896426</td><td>0.4596354</td><td>5.489643</td><td>Yep</td><td>Yep</td></tr>
-	<tr><th scope=row>3</th><td>8</td><td>B</td><td>South</td><td>M</td><td>0.05879476</td><td>0.4596354</td><td>5.058795</td><td>Yep</td><td>Yep</td></tr>
-	<tr><th scope=row>4</th><td>9</td><td>None</td><td>North</td><td>F</td><td>0.2349503</td><td>0.4596354</td><td>5.23495</td><td>Nope</td><td>Nope</td></tr>
-	<tr><th scope=row>5</th><td>10</td><td>None</td><td>South</td><td>M</td><td>0.362945</td><td>0.4596354</td><td>5.362945</td><td>Nope</td><td>Nope</td></tr>
-	<tr><th scope=row>6</th><td>11</td><td>None</td><td>North</td><td>F</td><td>0.8463468</td><td>0.4596354</td><td>5.846347</td><td>Nope</td><td>Nope</td></tr>
-	<tr><th scope=row>7</th><td>12</td><td>None</td><td>South</td><td>M</td><td>0.8863718</td><td>0.4596354</td><td>5.886372</td><td>Nope</td><td>Nope</td></tr>
+	<tr><th scope=row>1</th><td>6</td><td>B</td><td>South</td><td>M</td><td>0.106991</td><td>5.106991</td><td>Yep</td><td>Yep</td></tr>
+	<tr><th scope=row>2</th><td>7</td><td>B</td><td>North</td><td>M</td><td>0.4896426</td><td>5.489643</td><td>Yep</td><td>Yep</td></tr>
+	<tr><th scope=row>3</th><td>8</td><td>B</td><td>South</td><td>M</td><td>0.05879476</td><td>5.058795</td><td>Yep</td><td>Yep</td></tr>
+	<tr><th scope=row>4</th><td>9</td><td>None</td><td>North</td><td>F</td><td>0.2349503</td><td>5.23495</td><td>Nope</td><td>Nope</td></tr>
+	<tr><th scope=row>5</th><td>10</td><td>None</td><td>South</td><td>M</td><td>0.362945</td><td>5.362945</td><td>Nope</td><td>Nope</td></tr>
+	<tr><th scope=row>6</th><td>11</td><td>None</td><td>North</td><td>F</td><td>0.8463468</td><td>5.846347</td><td>Nope</td><td>Nope</td></tr>
+	<tr><th scope=row>7</th><td>12</td><td>None</td><td>South</td><td>M</td><td>0.8863718</td><td>5.886372</td><td>Nope</td><td>Nope</td></tr>
 </tbody>
 </table>
 
@@ -1496,16 +1519,15 @@ str<span class="p">(</span>DT<span class="p">)</span>
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Classes &apos;data.table&apos; and &apos;data.frame&apos;:	12 obs. of  9 variables:
- $ id        : int  1 2 3 4 5 6 7 8 9 10 ...
- $ prog      : Factor w/ 3 levels &quot;A&quot;,&quot;B&quot;,&quot;None&quot;: 1 1 1 1 2 2 2 2 3 3 ...
- $ sch       : Factor w/ 2 levels &quot;North&quot;,&quot;South&quot;: 1 2 1 2 1 2 1 2 1 2 ...
- $ gender    : Factor w/ 2 levels &quot;F&quot;,&quot;M&quot;: 1 1 1 1 2 2 2 2 1 2 ...
- $ score     : num  0.0674 0.9207 0.6911 0.0412 0.8092 ...
- $ mean_score: num  0.46 0.46 0.46 0.46 0.46 ...
- $ plusfive  : num  5.07 5.92 5.69 5.04 5.81 ...
- $ fSomeProg : Factor w/ 2 levels &quot;Nope&quot;,&quot;Yep&quot;: 2 2 2 2 2 2 2 2 1 1 ...
- $ someProg  : chr  &quot;Yep&quot; &quot;Yep&quot; &quot;Yep&quot; &quot;Yep&quot; ...
+<pre>Classes &apos;data.table&apos; and &apos;data.frame&apos;:	12 obs. of  8 variables:
+ $ id       : int  1 2 3 4 5 6 7 8 9 10 ...
+ $ prog     : Factor w/ 3 levels &quot;A&quot;,&quot;B&quot;,&quot;None&quot;: 1 1 1 1 2 2 2 2 3 3 ...
+ $ sch      : Factor w/ 2 levels &quot;North&quot;,&quot;South&quot;: 1 2 1 2 1 2 1 2 1 2 ...
+ $ gender   : Factor w/ 2 levels &quot;F&quot;,&quot;M&quot;: 1 1 1 1 2 2 2 2 1 2 ...
+ $ score    : num  0.0674 0.9207 0.6911 0.0412 0.8092 ...
+ $ plusfive : num  5.07 5.92 5.69 5.04 5.81 ...
+ $ fSomeProg: Factor w/ 2 levels &quot;Nope&quot;,&quot;Yep&quot;: 2 2 2 2 2 2 2 2 1 1 ...
+ $ someProg : chr  &quot;Yep&quot; &quot;Yep&quot; &quot;Yep&quot; &quot;Yep&quot; ...
  - attr(*, &quot;.internal.selfref&quot;)=&lt;externalptr&gt; 
  - attr(*, &quot;index&quot;)= atomic  
   ..- attr(*, &quot;sch&quot;)= int  1 3 5 7 9 11 2 4 6 8 ...
@@ -1521,7 +1543,7 @@ str<span class="p">(</span>DT<span class="p">)</span>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[62]:</div>
+<div class="prompt input_prompt">In&nbsp;[28]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># Some things that don&#39;t work</span>
@@ -1545,7 +1567,7 @@ DT<span class="p">[,</span> <span class="m">.</span><span class="p">(</span>gend
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[62]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[28]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
 <table>
@@ -1570,7 +1592,7 @@ DT<span class="p">[,</span> <span class="m">.</span><span class="p">(</span>gend
 
 </div>
 
-<div class="output_area"><div class="prompt output_prompt">Out[62]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[28]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
 <table>
@@ -1595,7 +1617,7 @@ DT<span class="p">[,</span> <span class="m">.</span><span class="p">(</span>gend
 
 </div>
 
-<div class="output_area"><div class="prompt output_prompt">Out[62]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[28]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
 <table>
@@ -1629,7 +1651,7 @@ DT<span class="p">[,</span> <span class="m">.</span><span class="p">(</span>gend
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Using-data.table-to-save-time">Using data.table to save time<a class="anchor-link" href="#Using-data.table-to-save-time">&#182;</a></h2>
+<h1 id="Saving-time-with-data.table">Saving time with data.table<a class="anchor-link" href="#Saving-time-with-data.table">&#182;</a></h1>
 </div>
 </div>
 </div>
@@ -1638,13 +1660,13 @@ DT<span class="p">[,</span> <span class="m">.</span><span class="p">(</span>gend
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Assigning-values">Assigning values<a class="anchor-link" href="#Assigning-values">&#182;</a></h3>
+<h2 id="Assigning-values">Assigning values<a class="anchor-link" href="#Assigning-values">&#182;</a></h2>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[65]:</div>
+<div class="prompt input_prompt">In&nbsp;[29]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="c1"># An example from Andrew Brooks&#39; advanced data.table article</span>
@@ -1665,42 +1687,42 @@ DT <span class="o">=</span> as.data.table<span class="p">(</span>M<span class="p
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[65]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[29]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
 <pre>   user  system elapsed 
-   0.62    1.33    1.96 </pre>
+   0.34    0.44    0.79 </pre>
 </div>
 
 </div>
 
-<div class="output_area"><div class="prompt output_prompt">Out[65]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[29]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
 <pre>   user  system elapsed 
-   1.91    0.00    1.92 </pre>
+   0.64    0.00    0.66 </pre>
 </div>
 
 </div>
 
-<div class="output_area"><div class="prompt output_prompt">Out[65]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[29]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
 <pre>   user  system elapsed 
-   0.03    0.06    0.10 </pre>
+   0.06    0.06    0.20 </pre>
 </div>
 
 </div>
 
-<div class="output_area"><div class="prompt output_prompt">Out[65]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[29]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
 <pre>   user  system elapsed 
-   0.02    0.00    0.01 </pre>
+   0.01    0.00    0.01 </pre>
 </div>
 
 </div>
@@ -1714,13 +1736,13 @@ DT <span class="o">=</span> as.data.table<span class="p">(</span>M<span class="p
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Calculations-with-&quot;By&quot;s">Calculations with "By"s<a class="anchor-link" href="#Calculations-with-&quot;By&quot;s">&#182;</a></h3>
+<h2 id="Calculations-with-&quot;By&quot;s">Calculations with "By"s<a class="anchor-link" href="#Calculations-with-&quot;By&quot;s">&#182;</a></h2>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[46]:</div>
+<div class="prompt input_prompt">In&nbsp;[30]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span>n <span class="o">&lt;-</span> <span class="m">1e6</span>
@@ -1736,7 +1758,7 @@ dtBigKey <span class="o">&lt;-</span> data.table<span class="p">(</span>dfBig<sp
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[47]:</div>
+<div class="prompt input_prompt">In&nbsp;[31]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="kn">library</span><span class="p">(</span>plyr<span class="p">)</span>
@@ -1754,42 +1776,42 @@ dtBigKey <span class="o">&lt;-</span> data.table<span class="p">(</span>dfBig<sp
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[47]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[31]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
 <pre>   user  system elapsed 
-  48.64    0.34   50.89 </pre>
+  41.84    0.38   44.23 </pre>
 </div>
 
 </div>
 
-<div class="output_area"><div class="prompt output_prompt">Out[47]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[31]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
 <pre>   user  system elapsed 
-   0.33    0.08    0.41 </pre>
+   0.32    0.06    0.37 </pre>
 </div>
 
 </div>
 
-<div class="output_area"><div class="prompt output_prompt">Out[47]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[31]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
 <pre>   user  system elapsed 
-   0.04    0.00    0.05 </pre>
+   0.07    0.00    0.07 </pre>
 </div>
 
 </div>
 
-<div class="output_area"><div class="prompt output_prompt">Out[47]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[31]:</div>
 
 
 <div class="output_text output_subarea output_execute_result">
 <pre>   user  system elapsed 
-   0.05    0.01    0.06 </pre>
+   0.06    0.00    0.07 </pre>
 </div>
 
 </div>
@@ -1800,7 +1822,7 @@ dtBigKey <span class="o">&lt;-</span> data.table<span class="p">(</span>dfBig<sp
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[50]:</div>
+<div class="prompt input_prompt">In&nbsp;[32]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-r"><pre><span></span><span class="kn">library</span><span class="p">(</span>magrittr<span class="p">)</span> <span class="c1"># This is a great library that allows coders to &quot;pipe&quot; the results of</span>
@@ -1816,16 +1838,16 @@ dtBigKey <span class="o">&lt;-</span> data.table<span class="p">(</span>dfBig<sp
 <div class="output">
 
 
-<div class="output_area"><div class="prompt output_prompt">Out[50]:</div>
+<div class="output_area"><div class="prompt output_prompt">Out[32]:</div>
 
 <div class="output_html rendered_html output_subarea output_execute_result">
 <table>
 <thead><tr><th></th><th scope=col>cat</th><th scope=col>x</th><th scope=col>x_mean</th><th scope=col>V1.x</th><th scope=col>V1.y</th></tr></thead>
 <tbody>
-	<tr><th scope=row>1</th><td>A</td><td>0.002874453</td><td>0.002874453</td><td>0.002874453</td><td>0.002874453</td></tr>
-	<tr><th scope=row>2</th><td>B</td><td>-0.002771587</td><td>-0.002771587</td><td>-0.002771587</td><td>-0.002771587</td></tr>
-	<tr><th scope=row>3</th><td>C</td><td>0.0007596055</td><td>0.0007596055</td><td>0.0007596055</td><td>0.0007596055</td></tr>
-	<tr><th scope=row>4</th><td>D</td><td>0.003984877</td><td>0.003984877</td><td>0.003984877</td><td>0.003984877</td></tr>
+	<tr><th scope=row>1</th><td>A</td><td>-0.002813597</td><td>-0.002813597</td><td>-0.002813597</td><td>-0.002813597</td></tr>
+	<tr><th scope=row>2</th><td>B</td><td>0.005081824</td><td>0.005081824</td><td>0.005081824</td><td>0.005081824</td></tr>
+	<tr><th scope=row>3</th><td>C</td><td>0.002282273</td><td>0.002282273</td><td>0.002282273</td><td>0.002282273</td></tr>
+	<tr><th scope=row>4</th><td>D</td><td>0.00209818</td><td>0.00209818</td><td>0.00209818</td><td>0.00209818</td></tr>
 </tbody>
 </table>
 
