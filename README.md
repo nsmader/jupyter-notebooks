@@ -1,2 +1,2 @@
-# jupyter-notebooks
-A collection of Jupyter notebooks for demonstrating methods
+# knitr-sandbox
+A collection of files for trying out and demonstrating literate programming concepts.
