@@ -1,0 +1,58 @@
+---
+title: "Test for conditional output"
+author: "Nick"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+show.text <- F
+show.header <- T
+
+```
+
+## Test for conditional text
+
+* Some references are [here](http://stackoverflow.com/questions/25407102/conditionally-display-a-block-of-text-in-r-markdown), [here](http://stackoverflow.com/questions/32944715/conditionally-display-block-of-markdown-text-using-knitr), and [here](http://stackoverflow.com/questions/17593912/insert-portions-of-a-markdown-document-inside-another-markdown-document-using-kn)
+
+Some text here. `r if(show.text)print("abc.")`
+
+Some math $\hat{\beta} = (X^{\prime}X)^{-1}X^{\prime}Y$.
+
+```{asis, eval = show.header}
+## Conditional header
+Text
+
+Bullet list:
+
+* Item 1
+* Item 2
+
+```
+
+## Attempting code-defined number of tabsets {.tabset}
+
+See this [great blog post](http://allican.be/blog/2016/02/07/rmarkdown_loops_and_knitr.html) for knitting master and child documents based on data contents.
+
+```{r Generate tabsets, eval = TRUE, echo = FALSE, results = 'asis'}
+n.g <- 10
+G <- 10
+df <- data.frame(x = runif(n.g*G), y = rnorm(n.g*G), g = rep(LETTERS[1:G], each = n.g))
+
+for (g.val in unique(df$g)){
+  cat("\n###", "Group =", g.val, "\n")
+  myplot <- ggplot(data = df[df$g==g.val,], aes(x = x, y = y)) +
+    geom_point() +
+    geom_smooth()
+  print(myplot)
+  # plot.new()
+  # with(df[df$g == g.val,], plot(x, y))
+  cat('\n \n ')
+}
+
+```
+
+
+
+

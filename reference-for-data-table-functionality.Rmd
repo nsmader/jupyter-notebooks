@@ -1,0 +1,510 @@
+---
+title: "Reference for data.table functionality"
+author: "Nick Mader (nmader@chapinhall.org)"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    theme: readable
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+For several great example-based resources for seeing what data.table can do, see:
+- DataCamp's data.table cheat sheet (saved under **H:\LIBRARY\R references/data.table/data.table cheat sheet.pdf**)
+- the built-in function `example(data.table)` after loading the `data.table library` into `R`, and
+- Andrew Brooks' great blog post on [Advanced Tips and Tricks with data.table](https://brooksandrew.github.io/simpleblog/articles/advanced-data-table/)
+
+# Basics of `data.table`
+
+We'll start our demo with a simple data set that reflects as much richness as we'll need. Later, we'll generate much larger data sets to demonstrate the considerable speed advantages of data.table over data.frame methods.
+
+Note that the data.frame "DF" and data.table "DT" have exactly parallel structure as displayed here. In R, their printed representations will differ slightly, where DT has a smarter printout, showing both head and tail rows, and field names printed at the bottom of the table for easier reference.
+
+```{r create_data}
+
+library(data.table)
+set.seed(60637)
+DF <- data.frame(id     = 1:12,
+                 prog   = rep(c("A", "B", "None"), each = 4),
+                 sch    = rep(c("North", "South"), times = 6),
+                 gender = sample(c("M", "F"), 12, replace = TRUE),
+                 score  = runif(12))
+DT <- data.table(DF, key = "id,prog,sch,gender")
+DF
+DT
+```
+
+# General structure of working with `data.table` objects
+
+Whereas data.frame contents can be accessed using square brackets and references to rows and columns, i.e. `df[*row indication*, *col indication*]`, data.table contents take three arguments: `dt[i,j,by]` where:
+
+* i - indication of rows
+* j - indication/operation on columns (optional)
+* by - built-in ability to run operations with a subset
+
+## Subsetting by rows
+
+This works both by the familiar `dt[.]` with a comma demarcating rows vs. colums, or simply with `dt[]` with no comma.
+
+```{r subsetrows_comma}
+DT[3:5,]
+```
+
+```{r subsetrows_nocomma}
+DT[3:5]
+```
+
+```{r subsetrows_logical}
+DT[sch == "North"]
+```
+
+
+```{r subsetrows_logical2}
+DT[prog %in% c("A", "B")]
+```
+
+## Working with `data.table` columns
+
+Referencing columns in data.table is also just a bit different than for data.frames.
+Rather than refering to column titles using their names, stored as a string, you
+refer to them using the unquoted name of the column. Think about this as similar to
+e.g. subset(), aggregate(), or within() functions, where you indicate the name
+of the data.frame and then are within the "environment" of that data.frame and
+can reference names of the columns directly, as if there were objects in the global
+environment.
+
+```{r columns_string}
+DT[, "sch"]
+
+```
+
+```{r columns_nostring}
+DT[1:5, sch]
+```
+
+However there are still two ways to reference columns by their string name.
+
+The first is by using the get() function, whose (helpful!) job it it is to take
+the name of an object, stored as a string, and fetch you the object itself.
+
+```{r columns_get}
+DT[1:5, get("sch")]
+```
+
+The second is by using the `with=FALSE` option within the `data.table` object. 
+
+```{r columns_with}
+DT[1:5, "sch", with = FALSE]
+
+mycols <- c("prog", "sch")
+DT[1:5, mycols, with = FALSE]
+
+```
+
+One way to think about why the name of the "with" argument makes sense is to 
+think about the way that the `with()` function works. To recap that, by declaring
+a `data.frame` project in the first argument of a `with()` function, we can write
+a function in the second argument as if we were inside of that object. The
+formal way to think of this is that `with()` (and its related function `within()`)
+lets us operate inside of the "environment" of the `data.frame`.
+
+For example:
+
+```{r columns_withexplanation}
+newDF <- data.frame(x = 1:10, y = 1:10 + rnorm(10))
+cor(newDF[, "x"], newDF[, "y"])
+with(newDF, cor(x,y))
+
+```
+
+`data.table` naturally works as if it were its own `with()` (or `within()`) function
+where, as we saw above, we can use the names of the columns that exist within that
+`data.table` object's environment without having to write out `DT$sch`, etc.
+
+With all that in mind, the `with=FALSE` argument effectively turns off this functionality,
+allowing us to refer to column names using quoted strings (rather than their actual
+names) as is more familiar with `data.frame`s.
+
+Additionally, think of groups of columns as lists:
+
+```{r columns_list}
+DT[1:3, list(id, sch)]
+```
+
+And note that ".()" is shorthand for "list()"
+
+```{r columns_dotlist}
+DT[1:3, .(id, sch)]
+```
+
+Indeed, it may be interesting to know that data.frames are constructed as a special
+type of list, where each list element is of exactly the same length. The fact that 
+lists can have contents of totally different types is what lets columns of data.frames
+have columns of different data types, unlike matrices which are also 2x2 tables but which
+can only have elements of the same (numeric) types.
+
+For example, the following command loops through DF's columns since, even though the `lapply`
+function receives the entire data frame as an argument, is knows to work with each of
+its columns separately since those are its base elements.
+
+```{r columns_colslistdemo}
+class(DF)
+typeof(DF)
+lapply(DF, function(x) class(x))
+```
+
+### Creating new columns on the fly
+
+`data.table` also allows for creation of new calculations of columns on the fly.
+
+```{r columns_calcOnFly}
+DT[, mean(score)]
+```
+
+```{r columns_calcsOnFly}
+DT[, .(mean(score), sum(score))]
+```
+
+```{r columns_namedCalcsOnFly}
+
+DT[, .(mean_score = mean(score), sum_score = sum(score))]
+```
+
+Note that `data.table` will "recycle" values as necessary to make sure that all output
+columns are of even length.
+
+```{r columns_calcOnFlyRecycled}
+DT[1:3, .(id, score, mean_score = mean(score))]
+```
+
+### Using the `j`, or "columns" slot for creating output besides columns
+
+The column, or `j`, argument can even take functions that do not return a column.
+
+```{r columns_fnOnFly, fig.width = 3, fig.height = 3}
+DT[, hist(score)$histogram]
+```
+
+Note that we can use curly braces in `j` just as we do elsewhere in `R` to run
+multiple commands at once.
+
+```{r columns_fnsOnFly, fig.width = 3, fig.height = 3}
+DT[, {print(score)
+      hist(score)$histogram
+      }]
+```
+
+
+# Working with `by`s
+
+`data.table` allows its operations to run on subsets of the data using a `by`.
+
+The `by` argument can accept a character string...
+
+```{r by_string}
+DT[, .(mean_score = mean(score)), by = "prog"]
+```
+
+... or as a column object within the data.table object.
+
+```{r by_obj}
+DT[, .(mean_score = mean(score)), by = prog]
+```
+
+We can do multiple "by"s with a string where the arguments are separated by commas
+although, interestingly, there cannot be spaces after the comma (at least in the
+current version.)
+
+```{r by_commas}
+#DT[, .(mean_score = mean(score)), by = "prog, sch"]
+DT[, .(mean_score = mean(score)), by = "prog,sch"]
+```
+
+Other ways of doing  multiple "by"s include using list syntax (i.e. the ".()")...
+
+```{r by_list}
+DT[, .(mean_score = mean(score)), by = .(prog,sch)]
+```
+
+... or with a vector of character names for the intended columns.
+```{r by_vector}
+myBys <- c("prog", "sch")
+DT[, .(mean_score = mean(score)), by = myBys]
+```
+
+Just like with columns, we can generate "by" information on the fly
+
+```{r by_fly}
+DT[, .(mean_score = mean(score)), by = .(inAnyProg = prog %in% c("A", "B"))]
+```
+
+And note that we can put all of our tricks together--use of the `i` argument
+for subsetting, `j` argument for calling and running calculations on columns,
+and `by` argument for subsetting--resulting in a very quick and elegant 
+(and *fast*, as we will see below) operation.
+
+```{r ijby_together}
+DT[sch == "North", .(mean_score = mean(score)), by = "gender"]
+```
+
+# Working with special values
+
+These values include `.N`, `.I`, `.GRP`, `.SD` and others, which have special
+meaning inside of a `data.table` object.
+
+```{r specialvlaues}
+DT[, .(count = .N, index = .I, groupnum = .GRP), by = prog]
+```
+
+## Using `.SD` to perform operations across many columns
+
+`.SD` is shorthand for all of the columns besides those used in the "by".
+
+```{r sd_allcols}
+n <- 100
+scores <- data.frame(cat = sample(LETTERS[1:3], n, replace = TRUE),
+                     score1 = runif(n),
+                     score2 = rnorm(n),
+                     score3 = rlogis(n))
+dtScores <- data.table(scores)
+dtScores[,lapply(.SD, mean), by = "cat"]
+```
+
+Subsets of all of the columns can be determined by adding a argument of `.SDcols`
+to the `data.table` object.
+
+```{r sd_sdcols}
+dtScores[,lapply(.SD, mean), by = "cat", .SDcols = c("score2","score3")]
+```
+
+It is even possible to combine multiple types of calculations at once, including
+mixtures of using .SD and field names directly. To do so, use a `c()` function
+across all of the field output represented as list objects.
+
+```{r sd_mixedcols}
+dtScores[,c(.(newCatName = paste("Category", cat)),
+            lapply(.SD, mean)),
+            by = "cat", .SDcols = c("score2","score3")]
+```
+
+### Generating calculations across columns
+
+Although `lapply(.SD, FUN)` allows for sequential operations of function `FUN` on
+columns, it does not allow for calculations *across* columns. For example, if we
+interesting in the maximum score across *rows*, the following code only obtains the max
+within *columns*.
+
+```{r sd_withincols}
+scoreCols <- c("score1", "score2","score3")
+dtScores[, lapply(.SD, max), .SDcols = scoreCols]
+```
+
+An `apply()` function can obtain the right result.
+
+```{r sd_acrosscols_apply}
+max_apply <- apply(dtScores[, scoreCols, with = FALSE], 1, max)
+head(max_apply)
+class(max_apply)
+```
+
+But another approach within the `data.table` environment is using `do.call`, which
+runs a function on `.SD` as a full list of arguments. In the below example, note
+that `pmax()` is a "parallel" max, meaning that it operates row-by-row, similar to
+`rowMeans()`.
+
+```{r sd_acrosscols_do.call}
+max_do.call <- dtScores[, .(do.call(what = pmax, args = .SD)), .SDcols = scoreCols]
+head(max_do.call)
+class(max_do.call)
+```
+
+The advantage of implementing these calculations using `data.table` is that they
+can be combine with other column calculations, subsetting, and `by`s.
+
+# Using the `:=` operator for assigning new columns
+
+Using `:=` generates an assignment within the data table. Rather than being an
+on-the-fly calculation which returns compressed information for just that 
+calculation, `:=` directly modifies the underlying data.
+
+Contrast the two commands below, where the former returns a reduced output, and
+the latter extend the data set.
+
+```{r assignment}
+DT[, .(mean_score  = mean(score)), by = prog]
+DT[,   mean_score := mean(score),  by = prog]
+DT
+```
+
+Note that, in this case, it would be redundant to assign the output to a new object,
+i.e. don't do: `newDT <- DT[, mean_score := mean(score), by = prog]`.
+
+The `:=` operator can be used to create multiple new columns.
+
+```{r}
+DT[, c("A", "B") := .(runif(nrow(DT)), letters[1:nrow(DT)])]
+DT
+```
+
+Columns can be removed by using `:=` to assign columns to `NULL`.
+
+```{r}
+DT[, "mean_score" := NULL]
+DT[, c("A", "B") := NULL]
+DT
+```
+
+The below code check demonstrates the use of `:=` in a more applied example, together
+with `.SD`, to show how we can easily perform many operations to create or update
+columns in our data set.
+
+```{r}
+scoreCols <- paste0("score", 1:3)
+scoreCols
+
+dtScores[, paste0(scoreCols, "_std"):=lapply(.SD, scale), .SDcols = scoreCols]
+head(dtScores)
+
+dtScores[, lapply(.SD, mean), .SDcols = paste0(scoreCols, "_std")]
+```
+
+# Chaining
+
+Chaining is a straightforward way to perform multiple sequential operations on a
+given object, where the operations occur from left to right.
+
+The idea of chaining is not unique to `data.table` objects, but can be very handy.
+
+```{r chaining_ex}
+# A fully spelled-out sequential process
+temp <- DT[, score_mean := mean(score), by = prog]
+temp[score_mean>0.4]
+
+# Done by chaining
+DT[, score_mean := mean(score), by = prog][score_mean>0.4]
+```
+
+## Curly braces
+
+Another way to perform many operations at once within a single `data.table`
+statement is using curly braces, where only the last statement is returned.
+
+```{r curlies}
+DT[, {
+  gender_long <- ifelse(gender == "F", "Female", "Male")
+  score_0to100 <- round(score * 100, 0)
+  .(id = id, prog = prog, gender = gender_long, score = score_0to100)
+     }]
+```
+
+# Using `data.table` for data manipulations
+
+Note that a `data.table` object also "inherits" from `data.frame` object
+properties.
+
+```{r dt_isdf}
+class(DT)
+```
+
+That means that operations that you commonly perform on `data.frame`s will work
+with `data.table` objects too (although some things may vary). Some examples:
+
+```{r dtAsDf_examples}
+DT$plusfive <- DT$score + 5
+DT <- within(DT, {
+    someProg <- ifelse(prog == "None", "Nope", "Yep")    
+    fSomeProg <- factor(someProg)
+})
+subset(DT, id >= 6)
+str(DT)
+```
+
+However, there are some things that don't work as expected.
+
+```{r dtAsDf_counterexamples}
+DT <- within(DT, {
+    male <- FALSE
+    male[gender == "M"] <- TRUE
+})
+cbind(DT, DT$gender == "M")
+```
+
+But there are alternatives:
+
+```{r dtAsDf_alternatives}
+DT$male <- FALSE
+DT[gender == "M", male := TRUE]
+DT[, .(gender, male)]
+```
+
+## Merging
+
+(Under construction.)
+
+# Saving time with `data.table`
+
+## Assigning values
+
+Depending on the nature of variable assignment or reassignment, `data.table` can
+have incredibly significant advantages. Taking an example from - Andrew Brooks'
+[blog post](https://brooksandrew.github.io/simpleblog/articles/advanced-data-table/)
+mentioned above, here is a case of having an extremely large table, where we try
+to reassign a large number of values in certain points within a data set.
+
+```{r speed_reassignment}
+M = matrix(1, nrow=100000, ncol=100)
+DF = as.data.frame(M)
+DT = as.data.table(M)
+system.time(for (i in 1:1000) DF[i, 1L] <- i)
+system.time(for (i in 1:1000) DT[i, V1:=i])
+system.time(for (i in 1:1000) M[i, 1L] <- i)
+system.time(for (i in 1:1000) set(DT, i, 1L, i))
+```
+
+The conclusion here is that use of methods specialized to `data.table` (here, the
+`set` function) can lead to significant speed-ups, even equivalent to better
+optimized data structures like matrices. See the `data.table` documentation or
+e-mail me (address is above) with questions about other potential uses of these
+specialized functions.
+
+## Calculations with `by`s
+
+First, we will generate a large data set to simulate common situations of data use.
+
+```{r speed_makeData}
+n <- 1e7
+dfBig <- data.frame(cat = sample(LETTERS[1:4], n, replace = TRUE), x = rnorm(n))
+dtBig <- data.table(dfBig)
+dtBigKey <- data.table(dfBig, key = "cat")
+```
+
+Here, contrasting several methods--`aggregate()` which is available in base `R`,
+`ddply` from the popular `plyr` package written by Hadley Wickham, and two methods
+using `data.table` methods.
+
+```{r speed_means}
+library(plyr)
+system.time(mean_agg <- aggregate(x ~ cat, data = dfBig, mean))
+system.time(mean_ply <- ddply(dfBig, .(cat), summarize, x_mean = mean(x)))
+system.time(mean_dt  <- dtBig[, mean(x), by = "cat"])
+system.time(mean_key <- dtBigKey[, mean(x), by = "cat"])
+```
+
+One takeaways are that `data.table` operations are orders of magnitude faster than
+common methods, and can be several times faster than even other popular packages
+in `R`. Another is that some of `data.table`s advantages do not even require a
+key to have been set to generate rapid calculations.
+
+Below, we inspecting the results to confirm that they are equivalent. Note:
+we use the `magrittr` package to "pipe" the results of one function into the
+first argument of another
+
+```{r check_calcs}
+library(magrittr)
+merge(mean_agg, mean_ply, by = "cat") %>% merge(mean_dt, by = "cat") %>% merge(mean_key, by = "cat")
+```
+
