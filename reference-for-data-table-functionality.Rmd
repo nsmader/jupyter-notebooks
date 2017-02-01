@@ -358,6 +358,18 @@ DT[, c("A", "B") := NULL]
 DT
 ```
 
+Note that recent versions of `data.table` distinctly recommend `:=NULL` as a means
+to remove columns as opposed to, say, using an `rm()` command in a `within()` 
+statement. The latter approach generates as warning, which recommends the former.
+
+```{r}
+DT <- within(DT, {
+  temp <- runif(nrow(DT))
+  # calculations using temp
+  rm(temp)
+})
+```
+
 The below code check demonstrates the use of `:=` in a more applied example, together
 with `.SD`, to show how we can easily perform many operations to create or update
 columns in our data set.
