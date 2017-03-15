@@ -1,0 +1,33 @@
+---
+title: "Analysis Brief"
+author: "Nick Mader, Chapin Hall at the University of Chicago (nmader@chapinhall.org)"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, error = FALSE)
+library(dplyr)
+library(data.table)
+library(magrittr)
+library(leaflet)
+library(ggplot2)
+library(scales)
+
+```
+
+## Safety by Neighborhood Violence
+
+My organization is `r org`. My programs are `r paste(subset(df, org == org)$program, collapse = ", ")`.
+
+```{r figure}
+head(subset(df, org == org))
+```
+
+## Maps
+
+You can also embed plots, for example:
+
+```{r map}
+leaflet() %>% addTiles() %>% addMarkers(lat = runif(n = 1, min = 41, max = 42), lng = runif(n = 1, min = -88, max = -86))
+```
+

@@ -1,0 +1,482 @@
+---
+title: "Cleaning Data with R"
+author: "Nick Mader, Chapin Hall at the University of Chicago (nmader@chapinhall.org)"
+date: "March 1, 2017"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = TRUE)
+try(setwd("~/GitHub/knitr-sandbox/"))
+library(knitr)
+library(tidyr)
+library(plyr)
+library(dplyr)
+library(data.table)
+library(magrittr)
+
+load("data-for-cleaning.Rda")
+```
+
+# Intro
+
+
+This article is a repository for methods used to clean common challenges in human services data. This will be continually be updated as we discover new challenges for data cleaning, and new techniques for simpler or more powerful handling.
+
+## Packages for Data Wrangling
+
+Some new and population packages that make data wrangling easy are:
+
+* `tidyr` and `dplyr` -- both packages by Hadley Wickham which have simple functions and syntax for subsetting, reshaping, merging, and creating new values
+* `data.table` -- a very powerful package with functions very similar to tidyr and dplyr. While the syntax is more challenging to master, `data.table` excels with complicated calculations done extremely quickly.
+
+One thing to always bear in mind is that `R` is extremely flexible, and there are many ways to accomplish any given goal. You should always keep an open mind for easier, simpler, more powerful ways of doing things, but always feel comfortable using methods that work for you! This article will hopefully be a useful for offering new ideas that provide new--or simpler/more powerful--solutions to problems that you already face.
+
+
+## Package References
+
+In addition to general blog posts, many creators of packages for R create "vignettes" which give a demonstration of their package's features. These vignettes often have clear explanations and examples of use. Together with this article--which aims to synthesize functions from different packages and applies this to specific problems with human service data--vignettes are helpful for gaining general comfort with many tools:
+
+* [Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html)
+* [Tidy Data](https://cran.r-project.org/web/packages/tidyr/vignettes/tidy-data.html) -- a vignette by Hadley Wickham that covers both `tidyr` and `dplyr` functions
+
+In addition to those vignettes, other similarly helpful blog posts include:
+
+* [Data Processing with dplyr & tidyr](https://rpubs.com/bradleyboehmke/data_wrangling)
+* [Introducing tidyr](https://blog.rstudio.org/2014/07/22/introducing-tidyr/)
+
+Finally Nick Mader <nmader@chapinhall.org> has also created [Reference for `data.table` Functionality](http://nsmader.github.io/knitr-sandbox/reference-for-data-table-functionality.html), which combines and extends techniques described in multiple other sources, including DataCamp's [`data.table` Cheat Sheet](https://s3.amazonaws.com/assets.datacamp.com/img/blog/data+table+cheat+sheet.pdf) and Andrew Brooks' blog post [Advanced tips and tricks with `data.table`](https://brooksandrew.github.io/simpleblog/articles/advanced-data-table/).
+
+## Data Used in this Article
+
+This article uses fake data created to reflect the same types of issues that are faced with real data, but without the sensitivity of using real data. These fake data represent youth enrollments with reading and creative arts programming, with information across multiple years, programs and locations, with different levels of engagement. **MAKE SURE TO CREATE A REFERENCE TO THIS CODE WHEN IT'S POSTED.**
+
+
+# Examine Data
+
+## Direct Views
+
+The `head()` and `tail()` functions respectively print out the first few, or last few, rows of a data set. This is helpful for getting a sense of the structure and values of data.
+
+```{r head Tots}
+head(TotsData_2016)
+```
+
+```{r tail Lab}
+tail(LabData_2016)
+```
+
+The `View()` function (note: which has a capital "V") opens a new tab in RStudio (so long as you are *using* RStudio) which allows you to scroll around the full data and even click to sort columns.
+
+## Meta-Data
+
+Ways to get "meta" information about a data set include the `str()`, or "str"ucture, function prints out information about the number of rows and columns of a table, and lists the names of the columns along with information about data type, and sample values. (Note that the `str()` function,  when applied to objects that aren't tables--such as geographic polygon files--provides other information that is similarly informative and customized to that object's type.)
+
+```{r str Tots}
+str(TotsData_2016)
+```
+
+```{r str Lab }
+str(LabData_2016)
+```
+
+
+The `colnames()` and `rownames()`, and `dim()` functions are also helpful for picking out more specific information about column (and row) names of tables, as well as their dimensions.
+
+```{r dim Tots}
+dim(TotsData_2016)
+```
+
+```{r dim Lab}
+dim(LabData_2016)
+```
+
+```{r cn Tots}
+colnames(TotsData_2016)
+```
+```{r cn Lab}
+colnames(LabData_2016)
+```
+
+
+
+## Stats and Summaries
+
+When examining a new data set, it's very helpful to get a summary of its information to get a feel for its contents, range of values, and potential problems that require cleaning. Some means for this are the `summary()` function which, when applied to tables, creates a summary of values in each column, customized to the type of information in that column.
+
+```{r summary Tots}
+summary(TotsData_2016)
+```
+
+```{r summary Lab}
+summary(LabData_2016)
+```
+
+The `table()` function also creates a frequency table of distinct values.
+
+```{r table Lab prog}
+table(LabData_2016$activity)
+```
+
+`table()` can accept a second argument to perform a cross-tabulation.
+
+```{r xtable Lab prog}
+table(LabData_2016$activity, LabData_2016$age)
+```
+
+Additional functions like `prop.table()` can turn the frequency counts returned by the `table()` function and turn them into proportions.
+
+```{r}
+# Margin = 1 refers to rows. Thus, this will return row-wise proportions.
+prop.table(table(LabData_2016$activity, LabData_2016$age), margin = 1)
+```
+
+Below, we calculate column-wise proportions, and use the `round()` function to create slightly more readable output.
+
+```{r}
+# Margin = 2 refers to columns Thus, this will return row-wise proportions.
+my_prop <- prop.table(table(LabData_2016$activity, LabData_2016$age), margin = 2)
+round(100*my_prop, digits = 2)
+```
+
+Another way to help display output is using the `sprintf()` function, which allows for all types of formatting. This admittedly take some getting used to, but there are some [blog posts on number formatting](https://www.r-bloggers.com/number-formatting/) that can be helpful, and we will aim to create more guidance here as this article builds.
+
+```{r}
+# Margin = 2 refers to columns Thus, this will return row-wise proportions.
+my_prop <- prop.table(table(LabData_2016$activity, LabData_2016$age), margin = 1)
+sprintf("%1.0f%%", 100*my_prop)
+
+```
+
+# Select, Modify, Combine Data
+
+## Combine
+
+For our sample data sets, one immediate task to consider is putting all of the different years of data together. This way, we can perform operations once, rather than multiple times for each data set.
+
+First, we will combine the different "Tots" data sets together, after adding a field to identify which year each row comes from.
+
+```{r rbind data}
+TotsData_2014$year <- 2014
+TotsData_2015$year <- 2015
+TotsData_2016$year <- 2016
+
+TotsData <- rbind(TotsData_2014, TotsData_2015, TotsData_2016)
+```
+
+Note that an alternate way to accomplish this same thing is with a `for` loop.
+
+```{r rbind data with for}
+
+TotsData_alt <- NULL
+for (y in 2014:2016){
+  temp <- get(paste0("TotsData_", y))
+  temp$year <- y
+  TotsData_alt <- rbind(TotsData_alt, temp)
+}
+all(TotsData == TotsData_alt)
+
+```
+
+Although this approach does not save us any lines of code in the current task, it could be very useful if there were many more data files to combine.
+
+Note the use of the `get()` function, which fetches an object based on a string version of its name. This function is particularly useful in `for` loops where the looping variable can help build part of an object's name. 
+
+<!-- Could also describe assign() here -->
+
+Attempting to do the same operation for the Lab data functions runs into issues.
+
+```{r rbind with mismatched columns}
+
+LabData_2014$year <- 2014
+LabData_2015$year <- 2015
+LabData_2016$year <- 2016
+
+# The following line generates an error of
+# "Error in rbind(deparse.level, ...) : 
+#   numbers of columns of arguments do not match"
+#LabData <- rbind(LabData_2014, LabData_2015, LabData_2016)
+
+```
+
+When inspecting the column names of our data sets, as the error suggests, we see that the names and numbers of columns do not match.
+
+```{r rbind column inspection}
+colnames(LabData_2014)
+colnames(LabData_2015)
+colnames(LabData_2016)
+```
+
+One perhaps obvious way to prepare the data set for the `rbind()` operation is to add to each data set the columns that it is missing. BHowever, that would require an involved process of accounting for, and then creating all these columns. Fortunately, the `rbind.fill()` function (from Hadley Wickham's `plyr` function) will do all of this for us.
+
+```{r}
+LabData <- rbind.fill(LabData_2014, LabData_2015, LabData_2016)
+head(LabData)
+tail(LabData)
+```
+
+
+<!-- merge -->
+<!-- might mention the many dplyr merge functions -->
+
+
+## Select/Subset Rows
+
+```{r}
+
+```
+
+
+## Select/Subset Columns
+
+<!-- can use dplyr's select() function to do things like select(one_of("a", "b", "c")), or can drop those by putting a "-" in front of the one_of(). Can do other neat things like select(starts_with("cpl")) or select(-starts_with("cpl")) -->
+
+```{r}
+colnames(LabData)
+LabData <- select(LabData, -starts_with("QR"))
+colnames(LabData)
+```
+
+## Rename
+
+For starters, it will be helpful to rename columns to not have spaces. 
+
+In base R we might have done something like:
+
+```{r}
+#colnames(TotsData)[colnames(TotsData) == "Reading Group - Minutes"] <- "Reading_Group_Min"
+
+```
+
+However, this is awkward syntax, and better options are available. One point of caution is that multiple different packages, including `plyr` and `dplyr`, have `rename()` functions, each of which have different syntax. Loading multiple of these packages at a given time may yield unexpected results, since the `rename()` function in the package which is loaded second will "mask" the first one. That is, the second one will become the default. For this reason, it is more reliable--and often clearer--to explicitly identify the package of the `rename()` function that you intend to use.
+
+In brief, the `rename()` function in `dplyr` allows for old and new versions of variable names to be unquoted, e.g. `rename(TotsData, Site = site)`, I typically recommend using the `plyr` version of rename since it requires quotes, but more easily allows for renaming of multiple columns at once.
+
+```{r}
+TotsData <- plyr::rename(TotsData, c("Reading Group - Minutes" = "Reading_Group_Min",
+                                     "Story Writing - Minutes" = "Story_Writing_Min"))
+colnames(TotsData)
+```
+
+
+## Reshape
+
+Both the `reshape2` and `data.table` libraries have a versions of both the `melt()` and `dcast()` functions that respectively reshape data to long, and to wide. While the `data.table` versions of these functions have slightly more usages, both versions will work almost exactly the same in practice.
+
+The `tidyr` package has equivalent functions--`gather()` and `spread()`--which respectively reshape to long and to wide.
+
+Both sets of functions have relatively simple syntax, and in different occasions may be easier to specify. We demonstrate the use of both here.
+
+### Reshaping to Long
+
+A [comparison of the `melt()` and `gather()` functions](https://www.r-bloggers.com/how-to-reshape-data-in-r-tidyr-vs-reshape2/).
+
+Reshaping the Tots data long so that we have a single "minutes" column. The pipe operator `%>%` is used to subsequently feed the results from the `melt()` into a `within()` function, that allows us to remove the now-unhelpful " - Minutes" part of the program name.
+
+```{r}
+TotsData_long <- melt(TotsData,
+                      id.vars = c("id", "age", "year", "sitetype", "site"),
+                      variable.name = "program",
+                      value.name = "minutes") %>%
+  within(program <- gsub("_Min", "", program))
+head(TotsData_long)
+```
+
+Alternatively, `gather()` (from `tidyr`) can accomplish the same operation:
+
+```{r}
+TotsData_long_alt <- gather(TotsData, key = "program", value =  "minutes", Reading_Group_Min, Story_Writing_Min) %>%
+  within(program <- gsub("_Min", "", program))
+head(TotsData_long_alt)
+```
+
+One advantage of `gather()` is that it allows for coders to either directly specify which columns should be put into long form--as we did above--or allows for specification of ID vars, as we did with the `melt()` above. To specify ID vars, one would "subtract" specified columns from the gather operation, e.g. `gather(TotsData, key = "var", value = "value", -id, -year)`. This makes sense from the perspective that the `gather()` function reshapes everything to long by default, and preserves only the subtracted columns as wide, which is the practical function of ID vars.
+
+### Reshaping to Wide
+
+The following code show how both the `dcast()` and `spread()` functions can be used to reshape the `LabData` file to get the number of sessions by year in wide format.
+
+First, we need to generate unique records at the id-by-year level, by adding up the total number of sessions. The following `select()`, `group_by()` and `summarize()` functions are also described in other sections in this document.
+
+<!-- /!\ Make good on the promise to say more about these functions -->
+
+```{r summarize sessions data}
+LabSessions <-
+  select(LabData, id, year, sessions) %>%
+  group_by(id, year) %>%
+  summarize(sessions = sum(sessions))
+```
+
+Now, reshaping usind `dcast()`:
+
+```{r reshape to wide with dcast}
+LabSessions_wide <- dcast(LabSessions,
+                           id ~ year,
+                           value.var = "sessions")
+head(LabSessions_wide)
+```
+
+Note that the (numeric) values of the `year` field have become the column names in the resulting table. One way to obtain more conventional (alphanumeric) field names would be to use the `rename()` function as above. Another simpler way would be to change the year field ahead of time to fit the column format that we want:
+```{r}
+LabSessions_wide <-
+  within(LabSessions, year <- paste0("year_", year)) %>%
+  dcast(id ~ year,
+        value.var = "sessions")
+head(LabSessions_wide)
+```
+
+Alternatively, we can also do this reshaping with the `spread()` function from the `tidyr` package:
+
+```{r reshape to wide with spread}
+LabSessions_wide <- 
+  within(LabSessions, year <- paste0("year_", year)) %>%
+  spread(key = year, value = sessions)
+head(LabSessions_wide)
+```
+
+One nice feature that is exclusive (at least as of present) to the `spread()` function is the ability to describe how to fill missing values. While the default is with `NA` values, this can be changed:
+
+```{r reshape to wide with spread and fill}
+LabSessions_wide <- 
+  within(LabSessions, year <- paste0("year_", year)) %>%
+  spread(key = year, value = sessions, fill = 0)
+head(LabSessions_wide)
+```
+
+
+## Sorting Rows
+
+While `sort()` and `order()` functions are commonly used base R functions, the `arrange()`
+
+```{r}
+head(TotsData_long)
+TotsData_long <- arrange(TotsData_long, id, year, -minutes)
+  # The "-" prefix indicates that a column should be listed as descending
+head(TotsData_long)
+```
+
+
+# Generate New Fields
+
+Both the `plyr` and `dplyr` packages have effectively (or fully?) identical `mutate()` and `summarize()` functions. (Note that, since both of these packages, including `tidyr`, `ggplot` and many other popular packages have been developed from Hadley Wickham, who is originally from New Zealand. That means that many function use a British English spelling of `summarise()`, `colour`, etc. It's worth noting that although you may see one spelling or another in various articles, different scripts, etc, whatever spelling you choose will work equally well.)
+
+The evocatively-named `mutate()` function adds new fields to an existing data set, which remains unmodified.
+
+The `summarize()` (or `summarise()`) function is used to summarize multiple values from a column into a single value. However, `summarize()` or similar functions may be combined with a `group_by()` function to perform summarizing calculations for each of a set of subsets of the data. Note that `n()` is a special function that is part of the `summarize()` which returns the number of observations, whether overall or by subsets specified by the `group_by()`.
+
+For example, we might use all of these functions to summarize how many youth in the Lab data have at attended at least 10 sessions in each year
+
+```{r mutate and combine}
+ge10Sessions_byYear <-
+  mutate(LabData, ge10Sessions = sessions >= 10) %>%
+  group_by(year) %>%
+  summarize(numYouth = n(),
+            pctGe10Sessions = mean(ge10Sessions))
+```
+
+While `mutate()` is helpful for creating new fields, the `within()` function that is part of base R may also provide more flexibility to perform operations within the context of a given data set. For example:
+
+```{r create columns using within}
+LabData <- within(LabData, {
+  for (val in c(1, 5, 10)){
+    assign(paste0("ge", val, "Sessions"),
+           sessions >= val)
+  }
+})
+head(LabData)
+```
+
+The above code creates a number of variables by combining a `for` loop and the `assign()` function. The `assign()` function allows us to create a new objects, whose name is specified in the first argument using a string. This is helpful because it is easy for use to use `paste()` or `paste0()` functions to generate new object names using, for example, values of a looping variable.
+
+However, note another telling curiosity of how the `within()` function above worked. In general, the `within()` preserves all objects that were created along the way. When used on tables, the `within()` function "recycles" any miscellaneous objects--here, the looping value `val`--to be able to fit into the table that gets output. Here, that means that a new column has been created whose only value is the last value that the `val` variable contained before the `within()` function finished running. To prevent this extraneous column from being created, the `rm()` function can be used to clean up any objects that do not belong as new fields. See the modified set of code below.
+
+```{r create columns using within and rm}
+LabData <- within(LabData, {
+  for (val in c(1, 5, 10)){
+    assign(paste0("ge", val, "Sessions"),
+           sessions >= val)
+  }
+  rm(val)
+})
+head(LabData)
+```
+
+
+<!-- ## Might also introduce within() to make language simpler/more readable -->
+
+
+# Handle Duplicates
+
+## Identify Duplicates
+
+Identify and get the number of duplicates.
+
+```{r dups id}
+dups <- duplicated(select(LabData, id))
+sum(dups)
+```
+
+This can be done across multiple columns.
+
+```{r dups id year and activity}
+dups <- duplicated(select(LabData, id, year, activity))
+sum(dups)
+```
+
+## Aggregate Across Rows
+
+One way to obtain unique records is to aggregate across rows:
+
+```{r}
+LabData_agg <-
+  group_by(LabData, id, year, activity) %>%
+  summarize(sessions = sum(sessions, na.rm = TRUE),
+            credits = sum(credits, na.rm = TRUE),
+            ge10Sessions = max(ge1Sessions),
+            ge10Sessions = max(ge5Sessions),
+            ge10Sessions = max(ge10Sessions))
+sum(duplicated(select(LabData_agg, id, year, activity)))
+```
+
+
+## Select Among Duplicates Based on Criteria
+
+Alternatively, instead of aggregating across rows, we may wish to select certain rows which meet specific criteria. For example, the following code selects the site from the Tots Data where youth have the most combined minutes of activity. First, we confirm that there are indeed duplicates.
+
+```{r}
+sum(duplicated(select(TotsData, id, year)))
+subset(arrange(TotsData, id, year), id == 102581)
+```
+
+
+```{r}
+TotsData_topSite <-
+  mutate(TotsData, totMin = Reading_Group_Min + Story_Writing_Min) %>%
+  group_by(id, year) %>%
+  filter(totMin == max(totMin))
+sum(duplicated(select(TotsData_topSite, id, year)))
+filter(arrange(ungroup(TotsData_topSite), id, year), id == 102581)
+```
+
+# Writing More Efficient Code with Loops
+
+<!-- #	- initialize new columns (e.g. lines 231-244... /!\ but why is this done?) -->
+<!-- # 	- get and assign -->
+
+# String Functions
+
+## Substituting Characters
+
+<!-- Talk about gsub and regex -->
+
+## Splitting Fields
+
+<!-- ## - remove duplicate characters -->
+<!-- # - change case (e.g. all to lower case, or proper case) -->
+<!-- # - remove punctuation -->
+<!-- # - replace underscores with spaces -->
+
