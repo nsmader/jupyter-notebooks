@@ -1,0 +1,96 @@
+---
+title: "Demo of R Functionality"
+author: "Nick Mader, Chapin Hall at the University of Chicago"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Intro
+
+This is a short article intended to describe and demo the breadth of strengths of the [R programming language](https://cran.r-project.org/).
+R is a free and opens source language descended from the [S programming language](https://en.wikipedia.org/wiki/S_(programming_language)).
+As a free and open source language, R benefits from extremely active development of cutting-edge methods across a
+wide expanse of fields, as well as an extremely large and helpful community of users who have asked--and answered, and developed new solutions
+to solve--most challenges that you may come across. For example, the [R-bloggers](https://www.r-bloggers.com/) site is an aggregator of many and 
+diverse blogs dedicated to use of R which describes new packages, practical implementations of various statistical methods--such as this
+exercise to scrape Twitter, and clean, reshape, and visualize [data on Donald Trump's tweets](http://varianceexplained.org/r/trump-tweets/)--which
+helps keep readers/subscribers current on methods, and learning from/drawing on applied examples.
+
+There is currently a wide variety of free resources for learning R. I have compiled a range of links in [this Google Document](https://docs.google.com/document/d/1HoTiaEoe1Wmq6ySqdIBps-0mTsDMIghpIPfg4ImIHUk/edit), and posted a number of 
+R programming cheat sheets in [this location](https://chapinhall.sharepoint.com/sites/coding/Shared%20Documents/Forms/AllItems.aspx?viewpath=%2Fsites%2Fcoding%2FShared%20Documents%2FForms%2FAllItems%2Easpx&id=%2Fsites%2Fcoding%2FShared%20Documents%2FProgramming%20References%2FR%20Cheatsheets)
+on the Coding Best Practices sharepoint site. One great, broadly practical guide for use of R in sourcing, cleaning, and analyzing data is
+the free, online [R for Data Science](http://r4ds.had.co.nz/) book.
+
+
+# Features
+
+## Interface
+
+R has a first-class, free Generalized User Interface (GUI) in [RStudio](https://www.rstudio.com/products/rstudio/). Standard features include:
+
+* Windows for scripting, console interaction, object browser (similar to Stata), browsers for images and interactive images
+* On-board help
+* Integration with cutting edge packages to automatically generate documents (manuscripts, slideshows, web applications, etc)
+
+One excellent recent innovation to RStudio is in [R Notebooks](http://rmarkdown.rstudio.com/r_notebooks.html) which allow for generation
+and display of visual elements in literate programming documents, similar to what is possible with [Jupyter Notebooks](http://jupyter.org/)
+but in simple text format, which is extremely helpful for things like version control.
+
+## Data Cleaning
+
+Some new and population packages that make data wrangling easy are:
+
+* `tidyr` and `dplyr` -- both packages by Hadley Wickham which have simple functions and syntax for subsetting, reshaping, merging, and creating new values
+* `data.table` -- a very powerful package with functions very similar to tidyr and dplyr. While the syntax is more challenging to master, `data.table` excels with complicated calculations done extremely quickly.
+
+In addition to general blog posts, many creators of packages for R create "vignettes" which give a demonstration of their package's features. These vignettes often have clear explanations and examples of use. Together with this article--which aims to synthesize functions from different packages and applies this to specific problems with human service data--vignettes are helpful for gaining general comfort with many tools:
+
+* [Introduction to dplyr](https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html)
+* [Tidy Data](https://cran.r-project.org/web/packages/tidyr/vignettes/tidy-data.html) -- a vignette by Hadley Wickham that covers both `tidyr` and `dplyr` functions
+
+In addition to those vignettes, other similarly helpful blog posts include:
+
+* [Data Processing with dplyr & tidyr](https://rpubs.com/bradleyboehmke/data_wrangling)
+* [Introducing tidyr](https://blog.rstudio.org/2014/07/22/introducing-tidyr/)
+
+Finally I have worked on a few combined/tailored guides to using these packages. This [reference for `data.table` Functionality](http://nsmader.github.io/knitr-sandbox/reference-for-data-table-functionality.html) combines and extends techniques described in multiple other sources, including DataCamp's [`data.table` Cheat Sheet](https://s3.amazonaws.com/assets.datacamp.com/img/blog/data+table+cheat+sheet.pdf) and Andrew Brooks' blog post [Advanced tips and tricks with `data.table`](https://brooksandrew.github.io/simpleblog/articles/advanced-data-table/). I am
+also working with Aida to create and refine a guide on cleaning data using the `dplyr`/`tidyr` suite of commands, as well as other packages like
+`lubridate` and `stringr` to demo work with dates and strings in ways that they apply to our common work.
+
+
+## Analytical Capacity
+
+* Almost everyone doing a PhD in statistics builds their methods for R
+* Econometrics aren't quite as well developed as for Stata, but libraries are more extensive than Python. (Not sure about SAS.)
+* A wide range of Statistica/Machine Learning methods are available for R. Stanford professors Trevor Hastie and Robert Tibshirani have written two free online books--[Introduction to Statistical Learning](https://www-bcf.usc.edu/~gareth/ISL/), and [Essentials of Statistical Learning](http://statweb.stanford.edu/~tibs/ElemStatLearn/)--as well as created a [free online course](https://lagunita.stanford.edu/courses/HumanitiesSciences/StatLearning/Winter2016/about)
+
+## Visualization
+
+### Static Visuals
+
+
+
+## Wrappers for Web APIs
+
+* 
+
+```{r cars}
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

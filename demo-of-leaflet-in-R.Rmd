@@ -1,0 +1,184 @@
+---
+title: "Demo of Leaflet in R"
+author: "Nick Mader"
+date: "July 11, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 5, fig.height = 3, warning = FALSE, message = FALSE, error = FALSE) # root.dir = "~/GitHub/leaflet-trainr/" ... currently not sure how to reliably get Knitr to respect this identification of root.directory. See https://github.com/yihui/knitr/issues/277
+library(leaflet)
+library(rgdal)
+library(readxl)
+library(RColorBrewer)
+library(shiny)
+library(foreign)
+```
+
+<!-- Note to self, here are some nice references:
+* for using knitr and RMarkdown -- http://kbroman.org/knitr_knutshell/pages/figs_tables.html 
+* the RMarkdown cheat sheet -- https://www.rstudio.com/wp-content/uploads/2016/03/rmarkdown-cheatsheet-2.0.pdf
+* info on Knitr options -- http://yihui.name/knitr/options/
+* RStudio's R Leaflet tutorial -- https://rstudio.github.io/leaflet/
+-->
+
+This document is intended to give a demonstration--though not full tutorial or demo of features--of how Leaflet can be used in R to easily generate attractive, content-rich, interactive maps.
+
+Although Leaflet is a Javascript package, folks in R's open source community have created binding that allow for a great deal of Leaflet's functionality to be available to R users, which decreases the training and logistical challenges to working across platforms when seeking to visualize and communicate our other data work.
+
+While I have strived to create a helpful sequence for learning about Leaflet's functionality in R, a more extensive tutorial on the topic can be found [here](https://rstudio.github.io/leaflet/).
+
+## Minimal Coding Required
+
+Creating an interactive map with colors, markers, zoom, etc is as easy as just a
+few lines of code.
+
+```{r first_map}
+m <- leaflet() %>%
+       addTiles() %>%  # Add default OpenStreetMap map tiles
+       addMarkers(lng=-87.5947675, lat=41.7858686, popup="Chapin Hall")
+m
+```
+
+## Baselayers
+By default, Leaflet in `R` uses map tiles from Open Street Maps. However, it can
+easily access and use map tiles from other sources and styles.
+
+```{r first_map_newBase}
+m %>% addProviderTiles("CartoDB.Positron")
+``` 
+
+## Displaying Data
+It is easy to display data that has geographic components. The code below
+sources data on CPS school High School report cards from the [City of Chicago Data Portal](https://data.cityofchicago.org/).
+
+```{r map_schools}
+# Download and prep CPS report card data
+schools <- read.csv("https://data.cityofchicago.org/api/views/2m8w-izji/rows.csv",
+                    stringsAsFactors = FALSE) %>%
+  within({
+    temp <- Latitude
+    Latitude <- Longitude
+    Longitude <- temp
+    PolicyLevel <- factor(CPS.Performance.Policy.Level)
+    rm(temp)
+  }) # ...because these are accidentally backwards
+
+# Download and merge an Excel file with enrollment data
+download.file(url = "http://cps.edu/Performance/Documents/Datafiles/enrollment_20th_day_2014.xls",
+              destfile = "sch_enrollment_xls.xls", method = "curl")
+sch_enrollment <- read_excel("sch_enrollment_xls.xls")
+sch_merge <- merge(x = schools,
+                   y = sch_enrollment,
+                   by.x = "School.ID",
+                   by.y = "School ID")
+
+# Generate the map
+leaflet(sch_merge) %>% addTiles() %>%
+  addMarkers(lng = ~Longitude, lat = ~Latitude, popup = ~Name.of.School)
+```
+
+## Symbolizing Data
+<!-- can color markers or size them by adding just a bit of code 
+# palette <- brewer.pal(n = length(levels(sch_merge$PolicyLevel)),
+#                       name = "Set1")
+-->
+```{r map_symbology}
+# Picking out a color palette
+palette <- colorFactor(palette = "Set1",
+                       domain = sch_merge$PolicyLevel)
+
+# Changing our display from markers to circles, and adding the formatting information we want, about color, radius, outline, and opacity
+sch_map_withFormats <- leaflet(sch_merge) %>% addProviderTiles("CartoDB.Positron") %>%
+  addCircles(lng = ~Longitude, lat = ~Latitude, popup = ~Name.of.School,
+             color = ~palette(PolicyLevel), radius = ~Totals/3, stroke = FALSE,
+             opacity = 0.8, fillOpacity = 0.8)
+sch_map_withFormats
+```
+
+## Formatting Display
+Adding a legend:
+```{r map_legend}
+# Using the map that we just created, but adding a legend, giving it the information on colors, values, and title that we want.
+sch_map_addedLegend <- 
+  sch_map_withFormats %>%
+    addLegend(position = "bottomright", pal = palette, values = ~PolicyLevel,
+              title = "CPS School Policy Levels")
+sch_map_addedLegend
+```
+
+## Generating Informative Pop-Ups
+We can create informative pop-ups using any of the information in out data sets,
+using basic HTML to create formats and web links.
+```{r map_detailedPopup}
+detailedPopUp <- with(sch_merge, paste(sep = "<br/>",
+                                       paste0("<b>", Name.of.School, "</b> (<a href='", Website,"'>web</a>)"),
+                                       paste0(Street.Address, " ", City, ", ", State, " " , ZIP.Code),
+                                       paste0("Network: ", Network),
+                                       paste0("Policy Level: ", PolicyLevel)))
+map_wPops <- leaflet(sch_merge) %>% addProviderTiles("CartoDB.Positron") %>%
+               addCircles(lng = ~Longitude, lat = ~Latitude, popup = ~detailedPopUp,
+                          color = ~palette(PolicyLevel), radius = ~Totals/3, stroke = FALSE,
+                          opacity = 0.8, fillOpacity = 0.8)
+map_wPops
+```
+
+## Map Underlays
+<!-- Add polygons for census tracts-->
+Just as we can add points, we can also work with polygons. Here, we use R to
+read a shape file and merge in ACS data that we will use to create data
+symbolization. 
+
+```{r map_polygonSymbology}
+# First, we load the rgdal package--the R Geo-spatial Data Abstraction Library--
+# which will allow us to do a variety of GIS data manipulations
+library(rgdal) 
+
+# Next, we load in a shape file representing all of the Census tracts in Cook County which already has ACS data merged in, and transform it into local coordinate reference system.
+# (Note: The "acs" package allows for downloading and working with ACS data directly in R. We don't use that here for the sake of space.)
+chiTracts <- readOGR(dsn = "../data/CensusTracts_acsMerge.shp",
+                     layer = "CensusTracts_acsMerge",
+                     encoding = "UTF-8",
+                     verbose = FALSE)
+chiTracts <- spTransform(chiTracts, CRS("+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs"))
+
+#Prepare colors for symbolizing our polygon, and add it to the map
+quantpal_bl <- colorQuantile(palette = "Blues", domain = NULL, n = 5)
+
+map_wPolys <- leaflet(sch_merge) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addPolygons(data = chiTracts,
+              fillColor = ~quantpal_bl(chiTracts$rEd_LtHS),
+              color = "#BDBDC3", weight = 0.5, fillOpacity = 0.8) %>%
+  addCircles(lng = ~Longitude, lat = ~Latitude, popup = ~detailedPopUp,
+             color = ~palette(PolicyLevel), radius = ~Totals/3, stroke = FALSE,
+             opacity = 0.8, fillOpacity = 0.8)
+map_wPolys
+
+```
+
+## Displaying Layers
+
+```{r map_layerSelection}
+quantpal_gr <- colorQuantile(palette = "Greens", domain = NULL, n = 5)
+map_wLayers <- leaflet(sch_merge) %>%
+  addProviderTiles("CartoDB.Positron") %>%
+  addCircles(lng = ~Longitude, lat = ~Latitude, popup = ~detailedPopUp,
+             color = ~palette(PolicyLevel), radius = ~Totals/3, stroke = FALSE,
+             opacity = 0.8, fillOpacity = 0.8, group = "Schools") %>%
+  addPolygons(data = chiTracts,
+              fillColor = ~quantpal_bl(chiTracts$rEd_LtHS),
+              color = "#BDBDC3", weight = 0.5, fillOpacity = 0.8,
+              group = "% Ed < HS") %>%
+  addPolygons(data = chiTracts,
+              fillColor = ~quantpal_gr(chiTracts$rNonWhite),
+              color = "#BDBDC3", weight = 0.5, fillOpacity = 0.8,
+              group = "% Non-White") %>%
+  addLayersControl(
+    baseGroups = c("% Ed < HS", "% Non-White"),
+    overlayGroups = c("Schools"),
+    options = layersControlOptions(collapsed = FALSE))
+map_wLayers
+```
+
+
