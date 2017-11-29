@@ -1,0 +1,49 @@
+---
+title: "Demo for Using Code to Generate Report Content"
+author: "Nick Mader <nmader@chapinhall.org>"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(scales)
+library(dplyr, quietly = TRUE)
+library(tidyr, quietly = TRUE)
+
+asIsStatement <- "```{r, <my chunk name>, results = 'as-is'}"
+```
+
+# Using Code for Content
+
+Most commonly in .Rmd files, code chunks are used to perform data work and produce output, and all of the narrative content is expressed in markdown outside of code chunks. However there are cases where it makes sense to generate narrative and/or structure using code and/or data.
+
+The central innovation here is to add a argument within the header of a code chunk to read ``r asIsStatement``, and use R code to produce the desired content that is either (1) rmarkdown content, using the `cat()` function to print out that content; or (2) table or visual content produced from data.
+
+# Examples
+
+The example here uses the built-in `mtcars` dataset in R to demonstrate how to use code to generate this content.
+
+## Looping figures {.tabset}
+
+```{r, results = "asis"}
+for (myCyl in sort(unique(mtcars$cyl))){
+  
+  ### Build and print the header that defines the tab
+  strCyl <- switch(as.character(myCyl), "4" = "Four", "6" = "Six", "8" = "Eight")
+  cat(paste0("\n###", strCyl, "-Cylinder Cars\n"))
+    # Note: extra carriage returns ("\n") are used to ensure that the rmarkdown code parses properly
+  
+  ### Generate the plot and send it to output
+  myPlot <- 
+    ggplot(data = filter(mtcars, cyl == myCyl), aes(x = wt, y = mpg)) +
+      geom_point() +
+      labs(x = "Weight (1000 lbs)", y = "Miles per US Gallon",
+           title = paste0("MPG vs Weight for ", strCyl, "-Cylinder Cars"))
+  print(myPlot)
+  cat("\n")
+    # Again, using a carriage return to ensure that the markdown parser understands that the current
+    # output is all that should comprise the current tab.
+}
+```
+
